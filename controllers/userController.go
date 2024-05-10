@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"goblogart/inits"
 	"goblogart/models"
 	"net/http"
@@ -81,7 +82,22 @@ func Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": "success login", "user": newUser})
 }
 
+func testPanic(number float64) float64 {
+	hasil := 20 / number
+	return hasil
+}
+
 func GetUsers(ctx *gin.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": r.(error).Error()})
+			return
+		}
+	}()
+
+	pembagian := testPanic(3) // jika argument == 0 maka akan terjadi panic
+	fmt.Println("hasil bagi:", pembagian)
+
 	var users []models.User
 
 	err := inits.DB.Find(&users).Error
