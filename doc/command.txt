@@ -1,0 +1,2 @@
+// Run Dev
+CompileDaemon -command="./goblogart"
