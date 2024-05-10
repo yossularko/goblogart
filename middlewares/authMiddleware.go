@@ -7,6 +7,7 @@ import (
 	"goblogart/models"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,17 @@ func RequireAuth(ctx *gin.Context) {
 	tokenString, errCookie := ctx.Cookie("Authorization")
 
 	if errCookie != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
+		hAuth := ctx.Request.Header.Get("Authorization")
+
+		splitedBearer := strings.Split(hAuth, "Bearer ")
+		if len(splitedBearer) < 2 {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		tokenString = splitedBearer[1]
+
 	}
 
 	token, errParse := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
