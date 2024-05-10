@@ -100,6 +100,25 @@ func GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": newUser})
 }
 
+func GetUsersWithPosts(ctx *gin.Context) {
+	var users []models.User
+
+	err := inits.DB.Preload("Posts").Find(&users).Error
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	var newUser []models.User
+
+	for _, usr := range users {
+		usr.Password = ""
+		newUser = append(newUser, usr)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": newUser})
+}
+
 func Validate(ctx *gin.Context) {
 	user, exists := ctx.Get("user")
 
