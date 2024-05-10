@@ -10,7 +10,7 @@ import (
 
 func CreatePost(ctx *gin.Context) {
 
-	var body models.PostInput
+	var body models.Post
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
