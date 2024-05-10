@@ -2,8 +2,6 @@ package inits
 
 import (
 	"fmt"
-	"goblogart/models"
-	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -26,9 +24,6 @@ func DBInit() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-
-	log.Println("running migrations")
-	db.AutoMigrate(&models.Post{})
 
 	DB = db
 }
