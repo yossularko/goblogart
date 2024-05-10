@@ -8,5 +8,6 @@ type Post struct {
 	Body   string `json:"body" binding:"required"`
 	Likes  int    `json:"likes" gorm:"int;default:0"`
 	Draft  bool   `json:"draft" gorm:"bool;default:true"`
-	Author string `json:"author" binding:"required"`
+	Author string `json:"author"`
+	UserID uint   `json:"user_id" gorm:"user_id"`
 }

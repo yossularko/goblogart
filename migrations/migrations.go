@@ -13,7 +13,7 @@ func init() {
 
 func main() {
 	log.Println("running migrations")
-	if err := inits.DB.AutoMigrate(&models.Post{}); err != nil {
+	if err := inits.DB.AutoMigrate(&models.User{}, &models.Post{}); err != nil {
 		log.Println("err migrations: ", err.Error())
 		return
 	}

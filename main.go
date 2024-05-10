@@ -1,8 +1,9 @@
 package main
 
 import (
-	"goblogart/controllers"
 	"goblogart/inits"
+	"goblogart/routes"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,11 +17,17 @@ func init() {
 func main() {
 	r := gin.Default()
 
-	r.POST("/", controllers.CreatePost)
-	r.GET("/", controllers.GetPosts)
-	r.GET("/:id", controllers.GetPost)
-	r.PUT("/:id", controllers.UpdatePost)
-	r.DELETE("/:id", controllers.DeletePost)
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello World!",
+		})
+	})
+
+	postGroup := r.Group("/posts")
+	routes.SetupPost(postGroup)
+
+	userGroup := r.Group("/users")
+	routes.SetupUser(userGroup)
 
 	r.Run()
 }
