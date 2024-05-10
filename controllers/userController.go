@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"goblogart/inits"
 	"goblogart/models"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -87,7 +89,37 @@ func testPanic(number float64) float64 {
 	return hasil
 }
 
+type AuthHeader struct {
+	IDToken string `header:"Authorization"`
+}
+
+func getBearerToken(ctx *gin.Context) (string, error) {
+	h := AuthHeader{}
+
+	defer func() (string, error) {
+		if r := recover(); r != nil {
+			return "", r.(error)
+		}
+
+		return "error", nil
+	}()
+
+	// bind Authorization Header to h and check for validation errors
+	if err := ctx.ShouldBindHeader(&h); err != nil {
+		return "", err
+	}
+
+	idTokenHeader := strings.Split(h.IDToken, "Bearer ")
+
+	if len(idTokenHeader) < 2 {
+		return "", errors.New("invalid bearer token")
+	}
+
+	return idTokenHeader[1], nil
+}
+
 func GetUsers(ctx *gin.Context) {
+	// test recover
 	defer func() {
 		if r := recover(); r != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": r.(error).Error()})
@@ -97,6 +129,14 @@ func GetUsers(ctx *gin.Context) {
 
 	pembagian := testPanic(3) // jika argument == 0 maka akan terjadi panic
 	fmt.Println("hasil bagi:", pembagian)
+
+	// test get token from bearer auth
+	bearer, errBearer := getBearerToken(ctx)
+	if errBearer != nil {
+		fmt.Println(errBearer.Error())
+	} else {
+		fmt.Println("berarer:", bearer)
+	}
 
 	var users []models.User
 
