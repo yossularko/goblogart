@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	"goblogart/inits"
 	"goblogart/models"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +43,9 @@ func GetPosts(ctx *gin.Context) {
 
 	var posts []models.Post
 
-	err := inits.DB.Find(&posts).Error
+	search := fmt.Sprintf("%%%s%%", strings.ToLower(ctx.Query("search")))
+
+	err := inits.DB.Find(&posts, "LOWER(title) LIKE ? OR LOWER(body) LIKE ?", search, search).Error
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
